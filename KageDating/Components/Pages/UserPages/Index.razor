@@ -1,0 +1,44 @@
+﻿@page "/users"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using KageDating.Models
+@using KageDating
+@inject IDbContextFactory<DataContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="users/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Users">
+    <PropertyColumn Property="user => user.FirstName" />
+    <PropertyColumn Property="user => user.LastName" />
+    <PropertyColumn Property="user => user.Email" />
+    <PropertyColumn Property="user => user.UserName" />
+    <PropertyColumn Property="user => user.DeleteDate" />
+    <PropertyColumn Property="user => user.CreateDate" />
+    <PropertyColumn Property="user => user.Password" />
+    <PropertyColumn Property="user => user.BirthDate" />
+
+    <TemplateColumn Context="user">
+        <a href="@($"users/edit?userid={user.UserId}")">Edit</a> |
+        <a href="@($"users/details?userid={user.UserId}")">Details</a> |
+        <a href="@($"users/delete?userid={user.UserId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    DataContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

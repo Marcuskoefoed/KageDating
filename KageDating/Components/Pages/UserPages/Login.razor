@@ -1,0 +1,49 @@
+﻿@page "/login"
+@using KageDating.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+
+<h3>Login</h3>
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Username:</label>
+        <InputText @bind-Value="loginModel.UserName" />
+    </div>
+    <div>
+        <label>Password:</label>
+        <InputText @bind-Value="loginModel.Password" type="password" />
+    </div>
+    <button type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+
+    public class LoginModel
+    {
+        [Required]
+        public string UserName { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+    }
+
+    private async Task HandleLogin()
+    {
+        var user = await AuthService.Authenticate(loginModel.UserName, loginModel.Password);
+
+        if (user != null)
+        {
+            // Redirect to the edit page with the user's ID
+            NavigationManager.NavigateTo($"/users/edit?UserId={user.UserId}");
+        }
+        else
+        {
+            // Handle failed login
+        }
+    }
+}
